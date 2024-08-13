@@ -6,13 +6,13 @@ Since the original v1:
 
 + Namespace update
 + Template name/path change in Embeddable from Embed to NSWDPC/Embed/Models/Embed, although `templates/Embed.ss` is still allowed
-+ Dropped support for gorriecoe/silverstripe-htmltag
++ Dropped requirement for gorriecoe/silverstripe-htmltag
 + Requires embed/embed:^4
 + Requires silverstripe/framework:^5
 + Requires silverstripe/asset-admin:^2 (`UploadField`)
 + Remove logic no longer supported by embed/embed:^4
 
-You can diff across repos to view all changes.
+You can diff across repos to view all changes, and the original module is in `v1` branch.
 
 ## Usage
 
