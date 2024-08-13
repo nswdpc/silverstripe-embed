@@ -3,11 +3,15 @@
 namespace NSWDPC\Embed\Extensions;
 
 use Embed\Embed;
+use Embed\Extractor;
+use Embed\OEmbed;
 use NSWDPC\Embed\Services\Logger;
 use SilverStripe\Assets\Image;
 use SilverStripe\Assets\Folder;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Storage\AssetStore;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TextareaField;
@@ -18,6 +22,8 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\View\HTML;
 use SilverStripe\View\SSViewer;
 
@@ -26,6 +32,14 @@ use SilverStripe\View\SSViewer;
  */
 class Embeddable extends DataExtension
 {
+
+    public const EMBED_TYPE_VIDEO = 'video';
+    public const EMBED_TYPE_RICH = 'rich';
+    public const EMBED_TYPE_IMAGE = 'image';
+    public const EMBED_TYPE_PHOTO = 'photo';
+    public const EMBED_TYPE_PICTURE = 'picture';
+    public const EMBED_TYPE_LINK = 'link';
+
     /**
      * @inheritdoc
      */
@@ -68,7 +82,7 @@ class Embeddable extends DataExtension
     /**
      * Defines the template to render the embed in.
      */
-    protected string $template = 'NSWDPC/Embed/Models/Embed';
+    protected string $embedTemplate = 'NSWDPC/Embed/Models/Embed';
 
     /**
      * @inheritdoc
@@ -103,12 +117,18 @@ class Embeddable extends DataExtension
                 ->setDescription(
                     _t(self::class . '.TITLEDESCRIPTION', 'Optional. Will be auto-generated if left blank')
                 ),
-                TextField::create(
-                    'EmbedSourceURL',
-                    _t(self::class . '.SOURCEURLLABEL', 'Source URL')
-                )
-                ->setDescription(
-                    _t(self::class . '.SOURCEURLDESCRIPTION', 'Specify a external URL')
+                CompositeField::create(
+                    TextField::create(
+                        'EmbedSourceURL',
+                        _t(self::class . '.SOURCEURLLABEL', 'Source URL')
+                    )
+                    ->setDescription(
+                        _t(self::class . '.SOURCEURLDESCRIPTION', 'Specify an external URL')
+                    ),
+                    CheckboxField::create(
+                        'ForceUpdate',
+                        _t(self::class . '.FORCEUPDATE', 'Check to update the meta data for this URL')
+                    )
                 ),
                 UploadField::create(
                     'EmbedImage',
@@ -139,36 +159,62 @@ class Embeddable extends DataExtension
     }
 
     /**
+     * Get the Extractor for the source URL
+     */
+    public function getExtractor(): Extractor
+    {
+        $sourceURL = $this->getOwner()->EmbedSourceURL ?? '';
+        if($sourceURL === '') {
+            throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
+        }
+        $parts = parse_url($sourceURL);
+        if(!isset($parts['scheme'])) {
+            throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL_SCHEME', 'Source URL has no scheme'));
+        }
+        if(!isset($parts['host'])) {
+            throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL_HOST', 'Source URL has no host'));
+        }
+        $embed = new Embed();
+        $extractor = $embed->get($sourceURL);
+        return $extractor;
+    }
+
+    /**
+     * Return the OEmbed for the URL, if it exists
+     */
+    public function getOEmbed(Extractor $extractor) : OEmbed
+    {
+        return $extractor->getOEmbed();
+    }
+
+    /**
      * Get the embed data using a source URL and write relevant data to the owner
      */
-    protected function writeFromEmbed(string $sourceURL): bool
+    protected function writeFromEmbed(bool $force = false): bool
     {
         try {
-            if($sourceURL === '') {
-                throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
-            }
-
-            $embed = new Embed();
-            $embed = $embed->get($sourceURL);
-
+            $extractor = $this->getExtractor();
             $owner = $this->getOwner();
             // write title if current is empty
             if ($owner->EmbedTitle == '') {
-                $owner->EmbedTitle = $embed->title;
+                $owner->EmbedTitle = $extractor->title;
             }
 
             // write description if current is empty
             if ($owner->EmbedDescription == '') {
-                $owner->EmbedDescription = $embed->description;
+                $owner->EmbedDescription = $extractor->description;
             }
 
-            if ($owner->isChanged('EmbedSourceURL')) {
+            $urlChanged = $owner->isChanged('EmbedSourceURL', DataObject::CHANGE_VALUE);
+            if ($force || $urlChanged) {
                 // embed data from updated source URL
-                $owner->EmbedHTML = $embed->code->html;
-                $owner->EmbedType = null;// update embed type in your own DataObject
-                $owner->EmbedWidth = $embed->code->width;
-                $owner->EmbedHeight = $embed->code->height;
-                $owner->EmbedAspectRatio = $embed->code->ratio;
+                $owner->EmbedHTML = $extractor->code->html;
+                $oembed = $this->getOEmbed($extractor);
+                // save type for oembed, if it exists
+                $owner->EmbedType = $oembed ? strtolower($oembed->get('type') ?? '') : '';
+                $owner->EmbedWidth = $extractor->code->width;
+                $owner->EmbedHeight = $extractor->code->height;
+                $owner->EmbedAspectRatio = $extractor->code->ratio;
                 // allow some customisation from the owner object prior to write, when the source url has changed
                 $owner->extend('onEmbedSourceChange', $embed);
             }
@@ -191,7 +237,7 @@ class Embeddable extends DataExtension
     {
         parent::onBeforeWrite();
         $owner = $this->getOwner();
-        $this->writeFromEmbed($owner->EmbedSourceURL ?? '');
+        $this->writeFromEmbed($this->owner->ForceUpdate == '1');
     }
 
     /**
@@ -244,30 +290,32 @@ class Embeddable extends DataExtension
     }
 
     /**
-     * Set CSS classes for templates
+     * Set the template to use for Embed
      * @param string $template template name without the .ss
      * @return DataObject Owner
      */
     public function setEmbedTemplate(string $template): DataObject
     {
-        $this->template = $template;
+        $this->embedTemplate = $template;
         return $this->getOwner();
+    }
+
+    /**
+     * Get the template to use for Embed
+     */
+    public function getEmbedTemplate(): string
+    {
+        return $this->embedTemplate;
     }
 
     /**
      * Renders embed into appropriate template HTML
      */
-    public function getEmbed(): string
+    public function getEmbed(): DBHTMLText
     {
         $owner = $this->getOwner();
-        $title = $owner->EmbedTitle;
-        $cssClasses = $owner->EmbedClass;
-        $type = $owner->EmbedType;
-        $template = $this->template;
-        $embedHTML = $owner->EmbedHTML;
-        $sourceURL = $owner->EmbedSourceURL;
-        $width = $owner->EmbedWidth;
-        $height = $owner->EmbedHeight;
+        $type = (string)$owner->EmbedType;
+        $template = $this->getEmbedTemplate();
         $templates = [];
         if($type !== '') {
             $templates[] = $template . '_' . $type;
@@ -276,27 +324,43 @@ class Embeddable extends DataExtension
         $templates[] = $template;
         $templates[] = "Embed";// BC support for original Embed template
         if (SSViewer::hasTemplate($templates)) {
-            return $owner->renderWith($templates);
+            $embed = $owner->renderWith($templates);
+        } else {
+            // get HTML based on type
+            $embed = $this->getEmbedByType();
         }
+        return $embed;
+    }
 
+    /**
+     * Return embed code by type
+     */
+    public function getEmbedByType(): DBHTMLText {
+        $owner = $this->getOwner();
+        $title = $owner->EmbedTitle;
+        $type = (string)$owner->EmbedType;
+        $cssClasses = $owner->EmbedClass;
+        $embedHTML = $owner->EmbedHTML;
+        $sourceURL = $owner->EmbedSourceURL;
+        $width = $owner->EmbedWidth;
+        $height = $owner->EmbedHeight;
         $html = '';
         $attributes = [];
         if($cssClasses !== '') {
             $attributes['class'] = $cssClasses;
         }
-
         switch ($type) {
-            case 'video':
-            case 'rich':
+            case self::EMBED_TYPE_VIDEO:
+            case self::EMBED_TYPE_RICH:
                 $html = HTML::createTag('div', $attributes, $embedHTML);
                 break;
-            case 'link':
+            case self::EMBED_TYPE_LINK:
                 $attributes['href'] = $sourceURL;
                 $html = HTML::createTag('a', $attributes, $title);
                 break;
-            case 'photo':
-            case 'image':
-            case 'picture':
+            case self::EMBED_TYPE_PHOTO:
+            case self::EMBED_TYPE_IMAGE:
+            case self::EMBED_TYPE_PICTURE:
                 $attributes['src'] = $sourceURL;
                 $attributes['width'] = $width;
                 $attributes['height'] = $height;
@@ -307,7 +371,6 @@ class Embeddable extends DataExtension
                 $html = "<!-- cannot embed -->";
                 break;
         }
-
-        return $html;
+        return DBField::create_field(DBHTMLText::class, $html);
     }
 }
