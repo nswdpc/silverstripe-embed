@@ -25,7 +25,7 @@ class Video extends Embed
     private static string $plural_name = 'Video';
 
     /**
-     * List the allowed included embed types.  If null all are allowed.
+     * List the allowed included embed types.  If empty all are allowed.
      */
     private static array $allowed_embed_types = [
         'video'

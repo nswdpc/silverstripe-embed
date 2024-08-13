@@ -18,6 +18,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\View\HTML;
 use SilverStripe\View\SSViewer;
 
 /**
@@ -122,8 +123,8 @@ class Embeddable extends DataExtension
             ]
         );
 
-        $allowedEmbedTypes = $this->getOwner()->getAllowedEmbedTypes();
-        if (is_array($allowedEmbedTypes) && count($allowedEmbedTypes) > 1) {
+        $allowedEmbedTypes = $this->getAllowedEmbedTypes();
+        if (count($allowedEmbedTypes) > 1) {
             $fields->addFieldToTab(
                 'Root.' . $tab,
                 ReadonlyField::create(
@@ -147,20 +148,18 @@ class Embeddable extends DataExtension
                 throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
             }
 
-            $embed = new Embed($sourceURL);
-            if(!$embed) {
-                throw new \RuntimeException(_t(self::class . '.INVALID_EMBED', 'The embed record is invalid'));
-            }
+            $embed = new Embed();
+            $embed = $embed->get($sourceURL);
 
             $owner = $this->getOwner();
             // write title if current is empty
             if ($owner->EmbedTitle == '') {
-                $owner->EmbedTitle = $embed->Title;
+                $owner->EmbedTitle = $embed->title;
             }
 
             // write description if current is empty
             if ($owner->EmbedDescription == '') {
-                $owner->EmbedDescription = $embed->Description;
+                $owner->EmbedDescription = $embed->description;
             }
 
             if ($owner->isChanged('EmbedSourceURL')) {
@@ -173,6 +172,8 @@ class Embeddable extends DataExtension
                 // allow some customisation from the owner object prior to write, when the source url has changed
                 $owner->extend('onEmbedSourceChange', $embed);
             }
+
+            return true;
 
         } catch (\Throwable $throwable) {
             Logger::log("Error writing embed object: " . $throwable->getMessage());
@@ -196,9 +197,14 @@ class Embeddable extends DataExtension
     /**
      * Get embed types allowed in this instance
      */
-    public function getAllowedEmbedTypes(): array|null
+    public function getAllowedEmbedTypes() : array
     {
-        return $this->getOwner()->config()->get('allowed_embed_types');
+        $allowedEmbedTypes = $this->getOwner()->config()->get('allowed_embed_types');
+        if(!is_array($allowedEmbedTypes)) {
+            $allowedEmbedTypes = [];
+        }
+
+        return $allowedEmbedTypes;
     }
 
     /**
@@ -250,9 +256,8 @@ class Embeddable extends DataExtension
 
     /**
      * Renders embed into appropriate template HTML
-     * @return HTML
      */
-    public function getEmbed()
+    public function getEmbed(): string
     {
         $owner = $this->getOwner();
         $title = $owner->EmbedTitle;
@@ -261,6 +266,8 @@ class Embeddable extends DataExtension
         $template = $this->template;
         $embedHTML = $owner->EmbedHTML;
         $sourceURL = $owner->EmbedSourceURL;
+        $width = $owner->EmbedWidth;
+        $height = $owner->EmbedHeight;
         $templates = [];
         if($type !== '') {
             $templates[] = $template . '_' . $type;
@@ -291,8 +298,8 @@ class Embeddable extends DataExtension
             case 'image':
             case 'picture':
                 $attributes['src'] = $sourceURL;
-                $attributes['width'] = $this->Width;
-                $attributes['height'] = $this->Height;
+                $attributes['width'] = $width;
+                $attributes['height'] = $height;
                 $attributes['alt'] = $title ?? '';
                 $html = HTML::createTag('img', $attributes);
                 break;

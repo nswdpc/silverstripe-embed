@@ -45,11 +45,9 @@ class Embed extends DataObject
     ];
 
     /**
-     * List the allowed included embed types.  If null all are allowed.
-     *
-     * @var array|null
+     * List the allowed included embed types.  If empty all are allowed.
      */
-    private static $allowed_embed_types;
+    private static array $allowed_embed_types = [];
 
     /**
      * Defines upload folder for embedded assets
@@ -103,10 +101,9 @@ class Embed extends DataObject
     /**
      * Renders an HTML anchor tag for this link
      * See Embeddable::getEmbed()
-     * @return HTML
      */
     public function forTemplate()
     {
-        return $this->Embed;
+        return $this->getEmbed();
     }
 }
