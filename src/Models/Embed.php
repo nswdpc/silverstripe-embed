@@ -1,12 +1,12 @@
 <?php
 
-namespace gorriecoe\Embed\Models;
+namespace NSWDPC\Embed\Models;
 
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TabSet;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
-use gorriecoe\Embed\Extensions\Embeddable;
+use NSWDPC\Embed\Extensions\Embeddable;
 
 /**
  * Embed
@@ -14,48 +14,40 @@ use gorriecoe\Embed\Extensions\Embeddable;
 class Embed extends DataObject
 {
     /**
-     * Defines the database table name
-     * @var string
+     * @inheritdoc
      */
-    private static $table_name = 'Embed';
+    private static string $table_name = 'Embed';
 
     /**
-     * Singular name for CMS
-     * @var string
+     * @inheritdoc
      */
-    private static $singular_name = 'Embed';
+    private static string $singular_name = 'Embed';
 
     /**
-     * Plural name for CMS
-     * @var string
+     * @inheritdoc
      */
-    private static $plural_name = 'Embed';
+    private static string $plural_name = 'Embed';
 
     /**
-     * Defines summary fields commonly used in table columns
-     * as a quick overview of the data for this dataobject
-     * @var array
+     * @inheritdoc
      */
-    private static $summary_fields = array(
+    private static array $summary_fields = [
         'EmbedTitle' => 'Title',
         'EmbedType' => 'Type',
         'EmbedSourceURL' => 'URL'
-    );
+    ];
 
     /**
-     * Defines extension names and parameters to be applied
-     * to this object upon construction.
-     * @var array
+     * @inheritdoc
      */
-    private static $extensions = array(
+    private static array $extensions = [
         Embeddable::class
-    );
-
+    ];
 
     /**
      * List the allowed included embed types.  If null all are allowed.
      *
-     * @var array
+     * @var array|null
      */
     private static $allowed_embed_types = null;
 
@@ -64,11 +56,10 @@ class Embed extends DataObject
      *
      * @var string
      */
-    private static $embed_folder = 'Embed';
+    private static string $embed_folder = 'Embed';
 
     /**
-     * CMS Fields
-     * @return FieldList
+     * @inheritdoc
      */
     public function getCMSFields()
     {
@@ -77,16 +68,14 @@ class Embed extends DataObject
                 "Root",
                 Tab::create("Main")
             )
-            ->setTitle(_t('SiteTree.TABMAIN', "Main"))
+            ->setTitle(_t(self::class. '.TABMAIN', "Main"))
         );
         $this->extend('updateCMSFields', $fields);
         return $fields;
     }
 
     /**
-     * Alias for EmbedTitle
-     * This is used by CMS Title and breadcrumbs.
-     * @return String
+     * @inheritdoc
      */
     public function getTitle()
     {
@@ -95,10 +84,10 @@ class Embed extends DataObject
 
     /**
      * Set CSS classes for templates
-     * @param string $class CSS classes.
-     * @return $this
+     * See Embeddable::getEmbedClass()
+     * @param string $class CSS classes
      */
-    public function setClass($class)
+    public function setClass(string $class): self
     {
         $this->setEmbedClass($class);
         return $this;
@@ -106,15 +95,16 @@ class Embed extends DataObject
 
     /**
      * Returns the classes for this embed.
-     * @return string
+     * See Embeddable::getEmbedClass()
      */
-    public function getClass()
+    public function getClass(): string
     {
-        return $this->EmbedClass;
+        return $this->getEmbedClass();
     }
 
     /**
      * Renders an HTML anchor tag for this link
+     * See Embeddable::getEmbed()
      * @return HTML
      */
     public function forTemplate()
