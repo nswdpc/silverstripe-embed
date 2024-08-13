@@ -1,25 +1,54 @@
 {
-  "name": "gorriecoe/silverstripe-embed",
-  "description": "Adds embed and video a dataobject along with dataextension to apply embed to existing objects.",
-  "type": "silverstripe-vendormodule",
-  "license": "BSD-3-Clause",
-  "authors": [
-    {
-      "name": "Gorrie Coe",
-      "email": "gorriecoe@gmail.com"
+    "name": "nswdpc/silverstripe-embed",
+    "description": "Adds embed functionality to data objects.",
+    "type": "silverstripe-vendormodule",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Gorrie Coe",
+            "email": "gorriecoe@gmail.com",
+            "role": "Original author"
+        },
+        {
+            "name": "PD web team",
+            "role": "Maintainer"
+        }
+    ],
+    "keywords": [
+        "silverstripe",
+        "cms",
+        "embed"
+    ],
+    "homepage": "http://github.com/nswdpc/silverstripe-embed",
+    "require": {
+        "embed/embed": "^4.4",
+        "silverstripe/framework": "^5",
+        "silverstripe/asset-admin": "^2"
+    },
+    "require-dev": {
+        "cambis/silverstripe-rector": "^0.5.1",
+        "phpunit/phpunit": "^9.5",
+        "syntro/silverstripe-phpstan": "^5",
+        "nswdpc/ci-files": "^1"
+    },
+    "repositories": [
+        {
+        "type": "git",
+        "url": "https://github.com/nswdpc/ci-files.git"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "NSWDPC\\Embed\\": "src/",
+            "NSWDPC\\Embed\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "silverstripe/recipe-plugin": true,
+            "silverstripe/vendor-plugin": true,
+            "phpstan/extension-installer": true
+        }
     }
-  ],
-  "keywords": [
-    "silverstripe",
-    "cms",
-    "embed"
-  ],
-  "homepage": "http://github.com/gorriecoe/silverstripe-embed",
-  "require": {
-    "silverstripe/framework": "^4",
-    "gorriecoe/silverstripe-htmltag": "^1.0"
-  },
-  "extra": {
-    "installer-name": "embed"
-  }
 }

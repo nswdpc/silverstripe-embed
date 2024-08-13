@@ -1,82 +1,35 @@
 # Silverstripe embed
 
-[![ko-fi](https://www.ko-fi.com/img/donate_sm.png)](https://ko-fi.com/E1E5HWRR)
-
-Adds embed and video a dataobject along with dataextension to apply embed to existing objects.
+This module adds embed functionality to data objects
 
 ## Installation
-Composer is the recommended way of installing SilverStripe modules.
+
+The only supported method of installing this module is via composer:
+
 ```
 composer require gorriecoe/silverstripe-embed
 ```
 
 ## Requirements
 
-- silverstripe/framework ^4.0
+- silverstripe/framework ^5
 
 ## Maintainers
 
-- [Gorrie Coe](https://github.com/gorriecoe)
++ PD web team
++ Original maintainer: Gorrie Coe
+
 
 ## Usage
-Relationship to Embed Dataobjects
-```php
-use gorriecoe\Embed\Models\Embed;
 
-class ClassName extends DataObject
-{
-    private static $has_one = [
-        'Embed' => Embed::class,
-        'Video' => Video::class
-    ];
+See [documentation for usage](./docs/en/001_index.md).
 
-    public function getCMSFields()
-    {
-        ...
-        $fields->addFieldsToTab(
-            'Main',
-            [
-                HasOneButtonField::create(
-                    'Embed',
-                    'Embed',
-                    $this
-                ),
-                HasOneButtonField::create(
-                    'Video',
-                    'Video',
-                    $this
-                )
-            ]
-        );
-        ...
-    }
-}
+## Legacy
 
-```
-Update current DataObject to be Embeddable with DataExtension
-```php
-use gorriecoe\Embed\Extensions\Embeddable;
+Copyright: see [LICENSE.md](./LICENSE.md), with additions and improvements
 
-class ClassName extends DataObject
-{
-    private static $extensions = [
-        Embeddable::class,
-    ];
+This is a fork of Gorrie Coe's [embed module](https://github.com/gorriecoe/silverstripe-embed). We have maintained the following link from the original module:
 
-    /**
-     * List the allowed included embed types.  If null all are allowed.
-     * @var array
-     */
-    private static $allowed_embed_types = [
-        'video',
-        'photo'
-    ];
+[![ko-fi](https://www.ko-fi.com/img/donate_sm.png)](https://ko-fi.com/E1E5HWRR)
 
-    /**
-     * Defines tab to insert the embed fields into.
-     * @var string
-     */
-    private static $embed_tab = 'Main';
-}
-
-```
+[Further information](https://github.com/elliot-sawyer/silverstripe-link/issues/31).

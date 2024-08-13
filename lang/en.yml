@@ -1,5 +1,5 @@
 en:
-  gorriecoe\Embed\Extensions\Embeddable:
+  NSWDPC\Embed\Extensions\Embeddable:
     DESCRIPTIONLABEL: Description
     IMAGELABEL: Image
     SOURCEURLDESCRIPTION: 'Specify a external URL'
@@ -7,13 +7,13 @@ en:
     TITLEDESCRIPTION: 'Optional. Will be auto-generated if left blank'
     TITLELABEL: Title
     TYPELABEL: Type
-  gorriecoe\Embed\Models\Embed:
+  NSWDPC\Embed\Models\Embed:
     PLURALNAME: Embed
     PLURALS:
       one: 'An Embed'
       other: '{count} Embed'
     SINGULARNAME: Embed
-  gorriecoe\Embed\Models\Video:
+  NSWDPC\Embed\Models\Video:
     PLURALNAME: Video
     PLURALS:
       one: 'A Video'
