@@ -197,7 +197,7 @@ class Embeddable extends DataExtension
     /**
      * Get embed types allowed in this instance
      */
-    public function getAllowedEmbedTypes() : array
+    public function getAllowedEmbedTypes(): array
     {
         $allowedEmbedTypes = $this->getOwner()->config()->get('allowed_embed_types');
         if(!is_array($allowedEmbedTypes)) {
