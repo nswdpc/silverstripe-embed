@@ -33,10 +33,15 @@ use SilverStripe\View\SSViewer;
 class Embeddable extends DataExtension
 {
     public const EMBED_TYPE_VIDEO = 'video';
+
     public const EMBED_TYPE_RICH = 'rich';
+
     public const EMBED_TYPE_IMAGE = 'image';
+
     public const EMBED_TYPE_PHOTO = 'photo';
+
     public const EMBED_TYPE_PICTURE = 'picture';
+
     public const EMBED_TYPE_LINK = 'link';
 
     /**
@@ -166,16 +171,18 @@ class Embeddable extends DataExtension
         if($sourceURL === '') {
             throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
         }
+
         $parts = parse_url($sourceURL);
         if(!isset($parts['scheme'])) {
             throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL_SCHEME', 'Source URL has no scheme'));
         }
+
         if(!isset($parts['host'])) {
             throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL_HOST', 'Source URL has no host'));
         }
+
         $embed = new Embed();
-        $extractor = $embed->get($sourceURL);
-        return $extractor;
+        return $embed->get($sourceURL);
     }
 
     /**
@@ -235,8 +242,8 @@ class Embeddable extends DataExtension
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        $owner = $this->getOwner();
-        $this->writeFromEmbed($this->owner->ForceUpdate == '1');
+        $this->getOwner();
+        $this->writeFromEmbed($this->getOwner()->ForceUpdate == '1');
     }
 
     /**
@@ -321,13 +328,10 @@ class Embeddable extends DataExtension
         }
 
         $templates[] = $template;
-        $templates[] = "Embed";// BC support for original Embed template
-        if (SSViewer::hasTemplate($templates)) {
-            $embed = $owner->renderWith($templates);
-        } else {
-            // get HTML based on type
-            $embed = $this->getEmbedByType();
-        }
+        $templates[] = "Embed";
+        // BC support for original Embed template
+        $embed = SSViewer::hasTemplate($templates) ? $owner->renderWith($templates) : $this->getEmbedByType();
+
         return $embed;
     }
 
@@ -349,6 +353,7 @@ class Embeddable extends DataExtension
         if($cssClasses !== '') {
             $attributes['class'] = $cssClasses;
         }
+
         switch ($type) {
             case self::EMBED_TYPE_VIDEO:
             case self::EMBED_TYPE_RICH:
@@ -371,6 +376,7 @@ class Embeddable extends DataExtension
                 $html = "<!-- cannot embed -->";
                 break;
         }
+
         return DBField::create_field(DBHTMLText::class, $html);
     }
 }
