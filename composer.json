@@ -37,9 +37,6 @@
         "url": "https://github.com/nswdpc/ci-files.git"
         }
     ],
-    "replace": {
-        "gorriecoe/silverstripe-embed": "self.version"
-    },
     "autoload": {
         "psr-4": {
             "NSWDPC\\Embed\\": "src/",
