@@ -176,7 +176,7 @@ class Embeddable extends DataExtension
             return true;
 
         } catch (\Throwable $throwable) {
-            Logger::log("Error writing embed object: " . $throwable->getMessage());
+            Logger::log("Error writing embed object: " . $throwable->getMessage(), "NOTICE");
             throw \SilverStripe\ORM\ValidationException::create(_t(
                 self::class . ".FAILED_TO_WRITE_EMBED",
                 "Sorry, the embed details could not be found or saved. Please check the URL entered and try again."
