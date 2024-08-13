@@ -7,7 +7,7 @@ This module adds embed functionality to data objects
 The only supported method of installing this module is via composer:
 
 ```
-composer require gorriecoe/silverstripe-embed
+composer require nswdpc/silverstripe-embed
 ```
 
 ## Requirements
