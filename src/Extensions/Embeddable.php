@@ -97,27 +97,27 @@ class Embeddable extends DataExtension
             [
                 TextField::create(
                     'EmbedTitle',
-                    _t(__CLASS__ . '.TITLELABEL', 'Title')
+                    _t(self::class . '.TITLELABEL', 'Title')
                 )
                 ->setDescription(
-                    _t(__CLASS__ . '.TITLEDESCRIPTION', 'Optional. Will be auto-generated if left blank')
+                    _t(self::class . '.TITLEDESCRIPTION', 'Optional. Will be auto-generated if left blank')
                 ),
                 TextField::create(
                     'EmbedSourceURL',
-                    _t(__CLASS__ . '.SOURCEURLLABEL', 'Source URL')
+                    _t(self::class . '.SOURCEURLLABEL', 'Source URL')
                 )
                 ->setDescription(
-                    _t(__CLASS__ . '.SOURCEURLDESCRIPTION', 'Specify a external URL')
+                    _t(self::class . '.SOURCEURLDESCRIPTION', 'Specify a external URL')
                 ),
                 UploadField::create(
                     'EmbedImage',
-                    _t(__CLASS__ . '.IMAGELABEL', 'Image')
+                    _t(self::class . '.IMAGELABEL', 'Image')
                 )
                 ->setFolderName($owner->EmbedFolder)
                 ->setAllowedExtensions(['jpg','png','gif']),
                 TextareaField::create(
                     'EmbedDescription',
-                    _t(__CLASS__ . '.DESCRIPTIONLABEL', 'Description')
+                    _t(self::class . '.DESCRIPTIONLABEL', 'Description')
                 )
             ]
         );
@@ -128,7 +128,7 @@ class Embeddable extends DataExtension
                 'Root.' . $tab,
                 ReadonlyField::create(
                     'EmbedType',
-                    _t(__CLASS__ . '.TYPELABEL', 'Type')
+                    _t(self::class . '.TYPELABEL', 'Type')
                 ),
                 'EmbedImage'
             );
@@ -146,6 +146,7 @@ class Embeddable extends DataExtension
             if($sourceURL === '') {
                 throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
             }
+
             $embed = new Embed($sourceURL);
             if(!$embed) {
                 throw new \RuntimeException(_t(self::class . '.INVALID_EMBED', 'The embed record is invalid'));
@@ -156,6 +157,7 @@ class Embeddable extends DataExtension
             if ($owner->EmbedTitle == '') {
                 $owner->EmbedTitle = $embed->Title;
             }
+
             // write description if current is empty
             if ($owner->EmbedDescription == '') {
                 $owner->EmbedDescription = $embed->Description;
@@ -172,14 +174,12 @@ class Embeddable extends DataExtension
                 $owner->extend('onEmbedSourceChange', $embed);
             }
 
-        } catch (\Throwable $e) {
-            Logger::log("Error writing embed object: " . $e->getMessage());
-            throw new ValidationException(
-                _t(
-                    self::class . ".FAILED_TO_WRITE_EMBED",
-                    "Sorry, the embed details could not be found or saved. Please check the URL entered and try again."
-                )
-            );
+        } catch (\Throwable $throwable) {
+            Logger::log("Error writing embed object: " . $throwable->getMessage());
+            throw \SilverStripe\ORM\ValidationException::create(_t(
+                self::class . ".FAILED_TO_WRITE_EMBED",
+                "Sorry, the embed details could not be found or saved. Please check the URL entered and try again."
+            ));
         }
     }
 
@@ -211,6 +211,7 @@ class Embeddable extends DataExtension
         if ($folder === '') {
             $folder = 'Embeddable';
         }
+
         return $folder;
     }
 
@@ -221,9 +222,10 @@ class Embeddable extends DataExtension
     public function setEmbedClass(string $class): DataObject
     {
         $classes = ($class) ? explode(' ', $class) : [];
-        foreach ($classes as $key => $value) {
+        foreach ($classes as $value) {
             $this->classes[$value] = $value;
         }
+
         return $this->getOwner();
     }
 
@@ -263,16 +265,19 @@ class Embeddable extends DataExtension
         if($type !== '') {
             $templates[] = $template . '_' . $type;
         }
+
         $templates[] = $template;
         $templates[] = "Embed";// BC support for original Embed template
         if (SSViewer::hasTemplate($templates)) {
             return $owner->renderWith($templates);
         }
+
         $html = '';
         $attributes = [];
         if($cssClasses !== '') {
             $attributes['class'] = $cssClasses;
         }
+
         switch ($type) {
             case 'video':
             case 'rich':
@@ -295,6 +300,7 @@ class Embeddable extends DataExtension
                 $html = "<!-- cannot embed -->";
                 break;
         }
+
         return $html;
     }
 }
