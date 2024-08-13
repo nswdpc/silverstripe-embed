@@ -3,6 +3,7 @@
 namespace NSWDPC\Embed\Extensions;
 
 use Embed\Embed;
+use NSWDPC\Embed\Services\Logger;
 use SilverStripe\Assets\Image;
 use SilverStripe\Assets\Folder;
 use SilverStripe\Assets\File;
@@ -55,19 +56,16 @@ class Embeddable extends DataExtension
 
     /**
      * Defines tab to insert the embed fields into.
-     * @var string
      */
     private static string $embed_tab = 'Main';
 
     /**
      * List of custom CSS classes for template.
-     * @var array
      */
     protected array $classes = [];
 
     /**
      * Defines the template to render the embed in.
-     * @var string
      */
     protected string $template = 'NSWDPC/Embed/Models/Embed';
 
@@ -78,7 +76,7 @@ class Embeddable extends DataExtension
     {
         $owner = $this->getOwner();
         $tab = $owner->config()->get('embed_tab');
-        $tab = isset($tab) ? $tab : 'Main';
+        $tab = is_string($tab) ? $tab : 'Main';
 
         // Ensure these fields don't get added by fields scaffold
         $fields->removeByName([
@@ -124,7 +122,8 @@ class Embeddable extends DataExtension
             ]
         );
 
-        if (isset($owner->AllowedEmbedTypes) && count($owner->AllowedEmbedTypes) > 1) {
+        $allowedEmbedTypes = $this->getOwner()->getAllowedEmbedTypes();
+        if (is_array($allowedEmbedTypes) && count($allowedEmbedTypes) > 1) {
             $fields->addFieldToTab(
                 'Root.' . $tab,
                 ReadonlyField::create(
@@ -141,8 +140,7 @@ class Embeddable extends DataExtension
     /**
      * Get the embed data using a source URL and write relevant data to the owner
      */
-    protected function writeFromEmbed(string $sourceURL): bool
-    {
+    protected function writeFromEmbed(string $sourceURL): bool {
         try {
             if($sourceURL === '') {
                 throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
@@ -162,7 +160,7 @@ class Embeddable extends DataExtension
                 $owner->EmbedDescription = $embed->Description;
             }
 
-            if ($this->owner->isChanged('EmbedSourceURL')) {
+            if ($owner->isChanged('EmbedSourceURL')) {
                 // embed data from updated source URL
                 $owner->EmbedHTML = $embed->code->html;
                 $owner->EmbedType = null;// update embed type in your own DataObject
@@ -178,7 +176,7 @@ class Embeddable extends DataExtension
             throw new ValidationException(
                 _t(
                     self::class . ".FAILED_TO_WRITE_EMBED",
-                    "Sorry, the embed details could not be found or saved. Please check the URL entered and try again"
+                    "Sorry, the embed details could not be found or saved. Please check the URL entered and try again."
                 )
             );
         }
@@ -197,13 +195,13 @@ class Embeddable extends DataExtension
     /**
      * Get embed types allowed in this instance
      */
-    public function getAllowedEmbedTypes(): array|null
+    public function getAllowedEmbedTypes() : array|null
     {
         return $this->getOwner()->config()->get('allowed_embed_types');
     }
 
     /**
-     * @return string
+     * Return embed folder from configuration or default
      */
     public function getEmbedFolder(): string
     {

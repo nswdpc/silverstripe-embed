@@ -49,12 +49,10 @@ class Embed extends DataObject
      *
      * @var array|null
      */
-    private static $allowed_embed_types = null;
+    private static $allowed_embed_types;
 
     /**
      * Defines upload folder for embedded assets
-     *
-     * @var string
      */
     private static string $embed_folder = 'Embed';
 

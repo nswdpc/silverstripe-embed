@@ -26,8 +26,6 @@ class Video extends Embed
 
     /**
      * List the allowed included embed types.  If null all are allowed.
-     *
-     * @var array
      */
     private static array $allowed_embed_types = [
         'video'
@@ -35,8 +33,6 @@ class Video extends Embed
 
     /**
      * Defines upload folder for embedded assets
-     *
-     * @var string
      */
     private static string $embed_folder = 'Video';
 }
