@@ -1,37 +1,49 @@
 {
-  "name": "nswdpc/silverstripe-embed",
-  "description": "Adds embed functionality to data objects.",
-  "type": "silverstripe-vendormodule",
-  "license": "BSD-3-Clause",
-  "authors": [
-    {
-      "name": "Gorrie Coe",
-      "email": "gorriecoe@gmail.com",
-      "role": "Original author"
+    "name": "nswdpc/silverstripe-embed",
+    "description": "Adds embed functionality to data objects.",
+    "type": "silverstripe-vendormodule",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Gorrie Coe",
+            "email": "gorriecoe@gmail.com",
+            "role": "Original author"
+        },
+        {
+            "name": "PD web team",
+            "role": "Maintainer"
+        }
+    ],
+    "keywords": [
+        "silverstripe",
+        "cms",
+        "embed"
+    ],
+    "homepage": "http://github.com/nswdpc/silverstripe-embed",
+    "require": {
+        "embed/embed": "^4.4",
+        "silverstripe/framework": "^5",
+        "silverstripe/asset-admin": "^2"
     },
-    {
-        "name": "PD web team",
-        "role": "Maintainer"
+    "require-dev": {
+        "cambis/silverstripe-rector": "^0.5.1",
+        "phpunit/phpunit": "^9.5",
+        "syntro/silverstripe-phpstan": "^5",
+        "nswdpc/ci-files": "^1"
+    },
+    "repositories": [
+        {
+        "type": "git",
+        "url": "https://github.com/nswdpc/ci-files.git"
+        }
+    ],
+    "replace": {
+        "gorriecoe/silverstripe-embed": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "NSWDPC\\Embed\\": "src/",
+            "NSWDPC\\Embed\\Tests\\": "tests/"
+        }
     }
-  ],
-  "keywords": [
-    "silverstripe",
-    "cms",
-    "embed"
-  ],
-  "homepage": "http://github.com/nswdpc/silverstripe-embed",
-  "require": {
-    "embed/embed": "^4.4",
-    "silverstripe/framework": "^5",
-    "silverstripe/asset-admin": "^2"
-  },
-  "replace": {
-      "gorriecoe/silverstripe-embed": "self.version"
-  },
-  "autoload": {
-     "psr-4": {
-         "NSWDPC\\Embed\\": "src/",
-         "NSWDPC\\Embed\\Tests\\": "tests/"
-     }
-  }
 }
