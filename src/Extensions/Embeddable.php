@@ -32,7 +32,6 @@ use SilverStripe\View\SSViewer;
  */
 class Embeddable extends DataExtension
 {
-
     public const EMBED_TYPE_VIDEO = 'video';
     public const EMBED_TYPE_RICH = 'rich';
     public const EMBED_TYPE_IMAGE = 'image';
@@ -182,7 +181,7 @@ class Embeddable extends DataExtension
     /**
      * Return the OEmbed for the URL, if it exists
      */
-    public function getOEmbed(Extractor $extractor) : OEmbed
+    public function getOEmbed(Extractor $extractor): OEmbed
     {
         return $extractor->getOEmbed();
     }
@@ -335,7 +334,8 @@ class Embeddable extends DataExtension
     /**
      * Return embed code by type
      */
-    public function getEmbedByType(): DBHTMLText {
+    public function getEmbedByType(): DBHTMLText
+    {
         $owner = $this->getOwner();
         $title = $owner->EmbedTitle;
         $type = (string)$owner->EmbedType;
