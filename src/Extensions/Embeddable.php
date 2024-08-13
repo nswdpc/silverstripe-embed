@@ -140,7 +140,8 @@ class Embeddable extends DataExtension
     /**
      * Get the embed data using a source URL and write relevant data to the owner
      */
-    protected function writeFromEmbed(string $sourceURL): bool {
+    protected function writeFromEmbed(string $sourceURL): bool
+    {
         try {
             if($sourceURL === '') {
                 throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
@@ -195,7 +196,7 @@ class Embeddable extends DataExtension
     /**
      * Get embed types allowed in this instance
      */
-    public function getAllowedEmbedTypes() : array|null
+    public function getAllowedEmbedTypes(): array|null
     {
         return $this->getOwner()->config()->get('allowed_embed_types');
     }
