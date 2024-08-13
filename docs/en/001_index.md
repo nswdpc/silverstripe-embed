@@ -5,11 +5,11 @@
 Since the original v1:
 
 + Namespace update
-+ Template change in Embeddable from Embed to NSWDPC/Embed/Models/Embed
-+ Dropped support for gorriecode/silverstripe-htmltag
++ Template name/path change in Embeddable from Embed to NSWDPC/Embed/Models/Embed, although `templates/Embed.ss` is still allowed
++ Dropped support for gorriecoe/silverstripe-htmltag
 + Requires embed/embed:^4
 + Requires silverstripe/framework:^5
-+ Requires silverstripe/asset-admin:^2
++ Requires silverstripe/asset-admin:^2 (`UploadField`)
 + Remove logic no longer supported by embed/embed:^4
 
 You can diff across repos to view all changes.
@@ -37,7 +37,7 @@ class ClassName extends DataObject
     /**
      * @inheritdoc
      */
-    private static $has_one = [
+    private static array $has_one = [
         'Embed' => Embed::class,
         'Video' => Video::class
     ];
@@ -84,15 +84,15 @@ class OtherClassName extends DataObject
     /**
      * @inheritdoc
      */
-    private static $extensions = [
+    private static array $extensions = [
         Embeddable::class,
     ];
 
     /**
-     * List the allowed included embed types.  If null all are allowed.
+     * List the allowed included embed types.  If empty all are allowed.
      * @var array
      */
-    private static $allowed_embed_types = [
+    private static array $allowed_embed_types = [
         'video',
         'photo'
     ];
@@ -101,7 +101,7 @@ class OtherClassName extends DataObject
      * Defines tab to insert the embed fields into.
      * @var string
      */
-    private static $embed_tab = 'Main';
+    private static string $embed_tab = 'Main';
 
     // other logic for the class
 }
