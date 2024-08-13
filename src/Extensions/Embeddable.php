@@ -217,7 +217,7 @@ class Embeddable extends DataExtension
                 $owner->EmbedHTML = $extractor->code->html;
                 $oembed = $this->getOEmbed($extractor);
                 // save type for oembed, if it exists
-                $owner->EmbedType = $oembed ? strtolower($oembed->get('type') ?? '') : '';
+                $owner->EmbedType = strtolower($oembed->get('type') ?? '');
                 $owner->EmbedWidth = $extractor->code->width;
                 $owner->EmbedHeight = $extractor->code->height;
                 $owner->EmbedAspectRatio = $extractor->code->ratio;
