@@ -9,8 +9,6 @@ use NSWDPC\Embed\Exceptions\InvalidSourceUrlException;
 use NSWDPC\Embed\Services\Logger;
 use SilverStripe\Assets\Image;
 use SilverStripe\Assets\Folder;
-use SilverStripe\Assets\File;
-use SilverStripe\Assets\Storage\AssetStore;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\FieldList;
@@ -18,10 +16,7 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\AssetAdmin\Forms\UploadField;
-use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\ValidationException;
-use SilverStripe\ORM\ValidationResult;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBHTMLText;
@@ -30,6 +25,18 @@ use SilverStripe\View\SSViewer;
 
 /**
  * Embeddable extension for Silverstripe DataObject
+ * @property ?string $EmbedTitle
+ * @property ?string $EmbedType
+ * @property ?string $EmbedSourceURL
+ * @property ?string $EmbedSourceImageURL
+ * @property ?string $EmbedHTML
+ * @property ?string $EmbedWidth
+ * @property ?string $EmbedHeight
+ * @property ?string $EmbedAspectRatio
+ * @property ?string $EmbedDescription
+ * @property int $EmbedImageID
+ * @method \SilverStripe\Assets\Image EmbedImage()
+ * @extends \SilverStripe\ORM\DataExtension<(\NSWDPC\Embed\Models\Embed & static)>
  */
 class Embeddable extends DataExtension
 {
@@ -170,16 +177,16 @@ class Embeddable extends DataExtension
     public function getExtractor(): Extractor
     {
         $sourceURL = trim($this->getOwner()->EmbedSourceURL ?? '');
-        if($sourceURL === '') {
+        if ($sourceURL === '') {
             throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
         }
 
-        $parts = parse_url($sourceURL);
-        if(!isset($parts['scheme'])) {
+        $parts = parse_url((string) $sourceURL);
+        if (!isset($parts['scheme'])) {
             throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL_SCHEME', 'Source URL has no scheme'));
         }
 
-        if(!isset($parts['host'])) {
+        if (!isset($parts['host'])) {
             throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL_HOST', 'Source URL has no host'));
         }
 
@@ -217,13 +224,13 @@ class Embeddable extends DataExtension
             $urlChanged = $owner->isChanged('EmbedSourceURL', DataObject::CHANGE_VALUE);
             if ($force || $urlChanged) {
                 // embed data from updated source URL
-                $owner->EmbedHTML = $extractor->code->html;
+                $owner->EmbedHTML = $extractor->code->html ?? '';
                 $oembed = $this->getOEmbed($extractor);
                 // save type for oembed, if it exists
                 $owner->EmbedType = strtolower($oembed->get('type') ?? '');
-                $owner->EmbedWidth = $extractor->code->width;
-                $owner->EmbedHeight = $extractor->code->height;
-                $owner->EmbedAspectRatio = $extractor->code->ratio;
+                $owner->EmbedWidth = $extractor->code->width ?? '';
+                $owner->EmbedHeight = $extractor->code->height ?? '';
+                $owner->EmbedAspectRatio = $extractor->code->ratio ?? '';
                 // allow some customisation from the owner object prior to write, when the source url has changed
                 $owner->extend('onEmbedSourceChange', $embed);
             }
@@ -257,7 +264,7 @@ class Embeddable extends DataExtension
     public function getAllowedEmbedTypes(): array
     {
         $allowedEmbedTypes = $this->getOwner()->config()->get('allowed_embed_types');
-        if(!is_array($allowedEmbedTypes)) {
+        if (!is_array($allowedEmbedTypes)) {
             $allowedEmbedTypes = [];
         }
 
@@ -328,7 +335,7 @@ class Embeddable extends DataExtension
         $type = (string)$owner->EmbedType;
         $template = $this->getEmbedTemplate();
         $templates = [];
-        if($type !== '') {
+        if ($type !== '') {
             $templates[] = $template . '_' . $type;
         }
 
@@ -355,7 +362,7 @@ class Embeddable extends DataExtension
         $height = $owner->EmbedHeight;
         $html = '';
         $attributes = [];
-        if($cssClasses !== '') {
+        if ($cssClasses !== '') {
             $attributes['class'] = $cssClasses;
         }
 
