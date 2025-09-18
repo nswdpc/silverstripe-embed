@@ -221,13 +221,13 @@ class Embeddable extends DataExtension
             $urlChanged = $owner->isChanged('EmbedSourceURL', DataObject::CHANGE_VALUE);
             if ($force || $urlChanged) {
                 // embed data from updated source URL
-                $owner->EmbedHTML = $extractor->code->html;
+                $owner->EmbedHTML = $extractor->code->html ?? '';
                 $oembed = $this->getOEmbed($extractor);
                 // save type for oembed, if it exists
                 $owner->EmbedType = strtolower($oembed->get('type') ?? '');
-                $owner->EmbedWidth = $extractor->code->width;
-                $owner->EmbedHeight = $extractor->code->height;
-                $owner->EmbedAspectRatio = $extractor->code->ratio;
+                $owner->EmbedWidth = $extractor->code->width ?? '';
+                $owner->EmbedHeight = $extractor->code->height ?? '';
+                $owner->EmbedAspectRatio = $extractor->code->ratio ?? '';
                 // allow some customisation from the owner object prior to write, when the source url has changed
                 $owner->extend('onEmbedSourceChange', $embed);
             }
