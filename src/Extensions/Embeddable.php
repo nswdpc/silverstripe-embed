@@ -29,6 +29,18 @@ use SilverStripe\View\SSViewer;
 
 /**
  * Embeddable extension for Silverstripe DataObject
+ * @property ?string $EmbedTitle
+ * @property ?string $EmbedType
+ * @property ?string $EmbedSourceURL
+ * @property ?string $EmbedSourceImageURL
+ * @property ?string $EmbedHTML
+ * @property ?string $EmbedWidth
+ * @property ?string $EmbedHeight
+ * @property ?string $EmbedAspectRatio
+ * @property ?string $EmbedDescription
+ * @property int $EmbedImageID
+ * @method \SilverStripe\Assets\Image EmbedImage()
+ * @extends \SilverStripe\ORM\DataExtension<(\NSWDPC\Embed\Models\Embed & static)>
  */
 class Embeddable extends DataExtension
 {
@@ -172,7 +184,7 @@ class Embeddable extends DataExtension
             throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
         }
 
-        $parts = parse_url($sourceURL);
+        $parts = parse_url((string) $sourceURL);
         if(!isset($parts['scheme'])) {
             throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL_SCHEME', 'Source URL has no scheme'));
         }
