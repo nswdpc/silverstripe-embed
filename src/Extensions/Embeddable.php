@@ -5,6 +5,7 @@ namespace NSWDPC\Embed\Extensions;
 use Embed\Embed;
 use Embed\Extractor;
 use Embed\OEmbed;
+use NSWDPC\Embed\Exceptions\InvalidSourceUrlException;
 use NSWDPC\Embed\Services\Logger;
 use SilverStripe\Assets\Image;
 use SilverStripe\Assets\Folder;
@@ -164,21 +165,22 @@ class Embeddable extends DataExtension
 
     /**
      * Get the Extractor for the source URL
+     * @throws InvalidSourceUrlException
      */
     public function getExtractor(): Extractor
     {
-        $sourceURL = $this->getOwner()->EmbedSourceURL ?? '';
+        $sourceURL = trim($this->getOwner()->EmbedSourceURL ?? '');
         if($sourceURL === '') {
-            throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
+            throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
         }
 
         $parts = parse_url($sourceURL);
         if(!isset($parts['scheme'])) {
-            throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL_SCHEME', 'Source URL has no scheme'));
+            throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL_SCHEME', 'Source URL has no scheme'));
         }
 
         if(!isset($parts['host'])) {
-            throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL_HOST', 'Source URL has no host'));
+            throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL_HOST', 'Source URL has no host'));
         }
 
         $embed = new Embed();
@@ -195,6 +197,7 @@ class Embeddable extends DataExtension
 
     /**
      * Get the embed data using a source URL and write relevant data to the owner
+     * @throws \SilverStripe\ORM\ValidationException
      */
     protected function writeFromEmbed(bool $force = false): bool
     {
@@ -227,6 +230,9 @@ class Embeddable extends DataExtension
 
             return true;
 
+        } catch (InvalidSourceUrlException $invalidSourceUrlException) {
+            Logger::log("Error with embed source url: {$invalidSourceUrlException->getMessage()}", "INFO");
+            return false;
         } catch (\Throwable $throwable) {
             Logger::log("Error writing embed object: " . $throwable->getMessage(), "NOTICE");
             throw \SilverStripe\ORM\ValidationException::create(_t(
