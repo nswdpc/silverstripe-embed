@@ -231,7 +231,6 @@ class Embeddable extends DataExtension
             return true;
 
         } catch (InvalidSourceUrlException $invalidSourceUrlException) {
-            Logger::log("Error with embed source url: {$invalidSourceUrlException->getMessage()}", "INFO");
             return false;
         } catch (\Throwable $throwable) {
             Logger::log("Error writing embed object: " . $throwable->getMessage(), "NOTICE");
