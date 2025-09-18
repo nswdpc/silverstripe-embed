@@ -26,10 +26,14 @@
         "silverstripe/asset-admin": "^2"
     },
     "require-dev": {
-        "cambis/silverstripe-rector": "^0.5.1",
+        "cambis/silverstripe-rector": "^2",
+        "cambis/silverstan": "^2",
+        "phpstan/phpstan": "^2",
+        "phpstan/phpstan-phpunit": "^2",
+        "rector/rector": "^2",
         "phpunit/phpunit": "^9.5",
-        "syntro/silverstripe-phpstan": "^5",
-        "nswdpc/ci-files": "^1"
+        "nswdpc/ci-files": "dev-v-4",
+        "friendsofphp/php-cs-fixer": "^3"
     },
     "repositories": [
         {
@@ -37,12 +41,6 @@
         "url": "https://github.com/nswdpc/ci-files.git"
         }
     ],
-    "autoload": {
-        "psr-4": {
-            "NSWDPC\\Embed\\": "src/",
-            "NSWDPC\\Embed\\Tests\\": "tests/"
-        }
-    },
     "config": {
         "allow-plugins": {
             "composer/installers": true,
