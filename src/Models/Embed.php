@@ -105,7 +105,7 @@ class Embed extends DataObject
      * Renders an HTML anchor tag for this link
      * See Embeddable::getEmbed()
      */
-    public function forTemplate()
+    public function forTemplate(): \SilverStripe\ORM\FieldType\DBHTMLText
     {
         return $this->getEmbed();
     }
