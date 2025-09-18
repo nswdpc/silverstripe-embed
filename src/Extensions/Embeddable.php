@@ -181,7 +181,7 @@ class Embeddable extends DataExtension
             throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
         }
 
-        $parts = parse_url((string) $sourceURL);
+        $parts = parse_url($sourceURL);
         if (!isset($parts['scheme'])) {
             throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL_SCHEME', 'Source URL has no scheme'));
         }
@@ -237,7 +237,7 @@ class Embeddable extends DataExtension
 
             return true;
 
-        } catch (InvalidSourceUrlException $invalidSourceUrlException) {
+        } catch (InvalidSourceUrlException) {
             return false;
         } catch (\Throwable $throwable) {
             Logger::log("Error writing embed object: " . $throwable->getMessage(), "NOTICE");
