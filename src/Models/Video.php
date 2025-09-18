@@ -2,8 +2,6 @@
 
 namespace NSWDPC\Embed\Models;
 
-use NSWDPC\Embed\Models\Embed;
-
 /**
  * Video - video specific embed
  **/

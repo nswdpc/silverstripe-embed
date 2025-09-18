@@ -8,8 +8,6 @@ use Embed\OEmbed;
 use NSWDPC\Embed\Services\Logger;
 use SilverStripe\Assets\Image;
 use SilverStripe\Assets\Folder;
-use SilverStripe\Assets\File;
-use SilverStripe\Assets\Storage\AssetStore;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\FieldList;
@@ -17,10 +15,7 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\AssetAdmin\Forms\UploadField;
-use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\ValidationException;
-use SilverStripe\ORM\ValidationResult;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBHTMLText;
@@ -180,16 +175,16 @@ class Embeddable extends DataExtension
     public function getExtractor(): Extractor
     {
         $sourceURL = $this->getOwner()->EmbedSourceURL ?? '';
-        if($sourceURL === '') {
+        if ($sourceURL === '') {
             throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
         }
 
         $parts = parse_url((string) $sourceURL);
-        if(!isset($parts['scheme'])) {
+        if (!isset($parts['scheme'])) {
             throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL_SCHEME', 'Source URL has no scheme'));
         }
 
-        if(!isset($parts['host'])) {
+        if (!isset($parts['host'])) {
             throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL_HOST', 'Source URL has no host'));
         }
 
@@ -264,7 +259,7 @@ class Embeddable extends DataExtension
     public function getAllowedEmbedTypes(): array
     {
         $allowedEmbedTypes = $this->getOwner()->config()->get('allowed_embed_types');
-        if(!is_array($allowedEmbedTypes)) {
+        if (!is_array($allowedEmbedTypes)) {
             $allowedEmbedTypes = [];
         }
 
@@ -335,7 +330,7 @@ class Embeddable extends DataExtension
         $type = (string)$owner->EmbedType;
         $template = $this->getEmbedTemplate();
         $templates = [];
-        if($type !== '') {
+        if ($type !== '') {
             $templates[] = $template . '_' . $type;
         }
 
@@ -362,7 +357,7 @@ class Embeddable extends DataExtension
         $height = $owner->EmbedHeight;
         $html = '';
         $attributes = [];
-        if($cssClasses !== '') {
+        if ($cssClasses !== '') {
             $attributes['class'] = $cssClasses;
         }
 
