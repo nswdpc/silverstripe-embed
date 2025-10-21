@@ -384,6 +384,7 @@ class Embeddable extends DataExtension
                 break;
         }
 
-        return DBField::create_field(DBHTMLText::class, $html);
+        // @phpstan-ignore return.type
+        return DBField::create_field('HTMLFragment', $html);
     }
 }
