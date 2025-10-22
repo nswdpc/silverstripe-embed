@@ -347,9 +347,8 @@ class Embeddable extends Extension
         $templates[] = "Embed";
         // BC support for original Embed template
         $templateEngine = Injector::inst()->create(TemplateEngine::class);
-        $embed = $templateEngine->hasTemplate($templates) ? $owner->renderWith($templates) : $this->getEmbedByType();
 
-        return $embed;
+        return $templateEngine->hasTemplate($templates) ? $owner->renderWith($templates) : $this->getEmbedByType();
     }
 
     /**
