@@ -12,7 +12,6 @@ use SilverStripe\View\SSViewer;
  */
 class VideoTest extends SapphireTest
 {
-
     protected $usesDatabase = true;
 
     /**
