@@ -56,7 +56,7 @@ class VideoTest extends SapphireTest
 
         $this->assertEquals(
             '<div data-test="1">' . $video->EmbedHTML . '</div>',
-            $template->__toString()
+            $template
         );
 
     }
