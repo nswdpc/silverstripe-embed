@@ -59,7 +59,7 @@ class Embeddable extends DataExtension
         'EmbedType' => 'Varchar',
         'EmbedSourceURL' => 'Varchar(255)',
         'EmbedSourceImageURL' => 'Varchar(255)',
-        'EmbedHTML' => 'HTMLText',
+        'EmbedHTML' => 'HTMLFragment',
         'EmbedWidth' => 'Varchar',
         'EmbedHeight' => 'Varchar',
         'EmbedAspectRatio' => 'Varchar',
