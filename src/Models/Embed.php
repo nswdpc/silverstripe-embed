@@ -10,6 +10,7 @@ use NSWDPC\Embed\Extensions\Embeddable;
 
 /**
  * Embed
+ * @mixin \NSWDPC\Embed\Extensions\Embeddable
  **/
 class Embed extends DataObject
 {
@@ -57,6 +58,7 @@ class Embed extends DataObject
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function getCMSFields()
     {
         $fields = FieldList::create(
@@ -73,6 +75,7 @@ class Embed extends DataObject
     /**
      * @inheritdoc
      */
+    #[\Override]
     public function getTitle()
     {
         return $this->EmbedTitle;
@@ -102,7 +105,7 @@ class Embed extends DataObject
      * Renders an HTML anchor tag for this link
      * See Embeddable::getEmbed()
      */
-    public function forTemplate()
+    public function forTemplate(): \SilverStripe\ORM\FieldType\DBHTMLText
     {
         return $this->getEmbed();
     }
