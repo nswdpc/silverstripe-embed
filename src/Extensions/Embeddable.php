@@ -171,14 +171,14 @@ class Embeddable extends DataExtension
     }
 
     /**
-     * Get the Extractor for the source URL
+     * Get the Extractor for the source URL, or return null if the source URL is empty
      * @throws InvalidSourceUrlException
      */
-    public function getExtractor(): Extractor
+    public function getExtractor(): ?Extractor
     {
         $sourceURL = trim($this->getOwner()->EmbedSourceURL ?? '');
         if ($sourceURL === '') {
-            throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
+            return null;
         }
 
         $parts = parse_url($sourceURL);
@@ -210,6 +210,11 @@ class Embeddable extends DataExtension
     {
         try {
             $extractor = $this->getExtractor();
+            if(is_null($extractor)) {
+                // no extractor.. URL is empty
+                return false;
+            }
+
             $owner = $this->getOwner();
             // write title if current is empty
             if ($owner->EmbedTitle == '') {
@@ -254,7 +259,6 @@ class Embeddable extends DataExtension
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        $this->getOwner();
         $this->writeFromEmbed($this->getOwner()->ForceUpdate == '1');
     }
 
