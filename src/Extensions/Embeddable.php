@@ -210,7 +210,7 @@ class Embeddable extends DataExtension
     {
         try {
             $extractor = $this->getExtractor();
-            if(is_null($extractor)) {
+            if (is_null($extractor)) {
                 // no extractor.. URL is empty
                 return false;
             }
