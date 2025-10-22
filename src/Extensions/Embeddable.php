@@ -60,7 +60,7 @@ class Embeddable extends DataExtension
         'EmbedType' => 'Varchar',
         'EmbedSourceURL' => 'Varchar(255)',
         'EmbedSourceImageURL' => 'Varchar(255)',
-        'EmbedHTML' => 'HTMLText',
+        'EmbedHTML' => 'HTMLFragment',
         'EmbedWidth' => 'Varchar',
         'EmbedHeight' => 'Varchar',
         'EmbedAspectRatio' => 'Varchar',
@@ -389,6 +389,7 @@ class Embeddable extends DataExtension
                 break;
         }
 
-        return DBField::create_field(DBHTMLText::class, $html);
+        // @phpstan-ignore return.type
+        return DBField::create_field('HTMLFragment', $html);
     }
 }
