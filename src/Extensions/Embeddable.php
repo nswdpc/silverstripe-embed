@@ -5,6 +5,7 @@ namespace NSWDPC\Embed\Extensions;
 use Embed\Embed;
 use Embed\Extractor;
 use Embed\OEmbed;
+use NSWDPC\Embed\Services\HTMLFilter;
 use NSWDPC\Embed\Services\Logger;
 use SilverStripe\Assets\Image;
 use SilverStripe\Assets\Folder;
@@ -94,6 +95,14 @@ class Embeddable extends DataExtension
      * Defines the template to render the embed in.
      */
     protected string $embedTemplate = 'NSWDPC/Embed/Models/Embed';
+
+    /**
+     * Getter for returning filtered HTML
+     */
+    public function getEmbedHTMLFiltered(): string
+    {
+        return HTMLFilter::create()->getHtmlFromEmbeddable($this->getOwner());
+    }
 
     /**
      * @inheritdoc
@@ -201,6 +210,14 @@ class Embeddable extends DataExtension
     }
 
     /**
+     * Return filtered HTML from extractor
+     */
+    public function getHtmlFromExtractor(Extractor $extractor): string
+    {
+        return $extractor->code->html ?? '';
+    }
+
+    /**
      * Get the embed data using a source URL and write relevant data to the owner
      */
     protected function writeFromEmbed(bool $force = false): bool
@@ -221,7 +238,7 @@ class Embeddable extends DataExtension
             $urlChanged = $owner->isChanged('EmbedSourceURL', DataObject::CHANGE_VALUE);
             if ($force || $urlChanged) {
                 // embed data from updated source URL
-                $owner->EmbedHTML = $extractor->code->html ?? '';
+                $owner->EmbedHTML = $this->getHtmlFromExtractor($extractor);
                 $oembed = $this->getOEmbed($extractor);
                 // save type for oembed, if it exists
                 $owner->EmbedType = strtolower($oembed->get('type') ?? '');

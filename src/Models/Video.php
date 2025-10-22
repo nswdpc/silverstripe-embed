@@ -33,4 +33,12 @@ class Video extends Embed
      * Defines upload folder for embedded assets
      */
     private static string $embed_folder = 'Video';
+
+    /**
+     * Getter for EmbedHTML
+     */
+    public function getEmbedHTML(): string
+    {
+        return $this->getEmbedHTMLFiltered();
+    }
 }
