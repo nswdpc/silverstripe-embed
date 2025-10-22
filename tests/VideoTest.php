@@ -34,7 +34,7 @@ class VideoTest extends SapphireTest
     /**
      * Create a video embed
      */
-    public function testYoutubeEmbed()
+    public function testYoutubeEmbed(): void
     {
         $url = "https://www.youtube.com/watch?v=YH3c1QZzRK4";
         $video = Video::create();
