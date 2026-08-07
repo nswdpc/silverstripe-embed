@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NSWDPC\Embed\Services;
 
 use Psr\Log\LoggerInterface;
