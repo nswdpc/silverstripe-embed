@@ -19,11 +19,12 @@ use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\View\HTML;
-use SilverStripe\View\SSViewer;
+use SilverStripe\View\TemplateEngine;
 
 /**
  * Embeddable extension for Silverstripe DataObject
@@ -38,9 +39,9 @@ use SilverStripe\View\SSViewer;
  * @property ?string $EmbedDescription
  * @property int $EmbedImageID
  * @method \SilverStripe\Assets\Image EmbedImage()
- * @extends \SilverStripe\ORM\DataExtension<(\NSWDPC\Embed\Models\Embed & static)>
+ * @extends \SilverStripe\Core\Extension<(\NSWDPC\Embed\Models\Embed & static)>
  */
-class Embeddable extends DataExtension
+class Embeddable extends Extension
 {
     public const EMBED_TYPE_VIDEO = 'video';
 
@@ -101,7 +102,7 @@ class Embeddable extends DataExtension
     /**
      * @inheritdoc
      */
-    public function updateCMSFields(FieldList $fields)
+    public function updateCMSFields(FieldList $fields): FieldList
     {
         $owner = $this->getOwner();
         $tab = $owner->config()->get('embed_tab');
@@ -235,7 +236,7 @@ class Embeddable extends DataExtension
 
     /**
      * Get the embed data using a source URL and write relevant data to the owner
-     * @throws \SilverStripe\ORM\ValidationException
+     * @throws \SilverStripe\Core\Validation\ValidationException
      */
     protected function writeFromEmbed(bool $force = false): bool
     {
@@ -277,7 +278,7 @@ class Embeddable extends DataExtension
             return false;
         } catch (\Throwable $throwable) {
             Logger::log("Error writing embed object: " . $throwable->getMessage(), "NOTICE");
-            throw \SilverStripe\ORM\ValidationException::create(_t(
+            throw \SilverStripe\Core\Validation\ValidationException::create(_t(
                 self::class . ".FAILED_TO_WRITE_EMBED",
                 "Sorry, the embed details could not be found or saved. Please check the URL entered and try again."
             ));
@@ -289,7 +290,6 @@ class Embeddable extends DataExtension
      */
     public function onBeforeWrite()
     {
-        parent::onBeforeWrite();
         $this->writeFromEmbed($this->getOwner()->ForceUpdate == '1');
     }
 
@@ -377,9 +377,9 @@ class Embeddable extends DataExtension
         $templates[] = $template;
         $templates[] = "Embed";
         // BC support for original Embed template
-        $embed = SSViewer::hasTemplate($templates) ? $owner->renderWith($templates) : $this->getEmbedByType();
+        $templateEngine = Injector::inst()->create(TemplateEngine::class);
 
-        return $embed;
+        return $templateEngine->hasTemplate($templates) ? $owner->renderWith($templates) : $this->getEmbedByType();
     }
 
     /**
