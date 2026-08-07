@@ -6,6 +6,7 @@ use Embed\Embed;
 use Embed\Extractor;
 use Embed\OEmbed;
 use NSWDPC\Embed\Services\HTMLFilter;
+use NSWDPC\Embed\Exceptions\InvalidSourceUrlException;
 use NSWDPC\Embed\Services\Logger;
 use SilverStripe\Assets\Image;
 use SilverStripe\Assets\Folder;
@@ -179,22 +180,23 @@ class Embeddable extends DataExtension
     }
 
     /**
-     * Get the Extractor for the source URL
+     * Get the Extractor for the source URL, or return null if the source URL is empty
+     * @throws InvalidSourceUrlException
      */
-    public function getExtractor(): Extractor
+    public function getExtractor(): ?Extractor
     {
-        $sourceURL = $this->getOwner()->EmbedSourceURL ?? '';
+        $sourceURL = trim($this->getOwner()->EmbedSourceURL ?? '');
         if ($sourceURL === '') {
-            throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL', 'Source URL is empty'));
+            return null;
         }
 
-        $parts = parse_url((string) $sourceURL);
+        $parts = parse_url($sourceURL);
         if (!isset($parts['scheme'])) {
-            throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL_SCHEME', 'Source URL has no scheme'));
+            throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL_SCHEME', 'Source URL has no scheme'));
         }
 
         if (!isset($parts['host'])) {
-            throw new \RuntimeException(_t(self::class . '.EMPTY_SOURCE_URL_HOST', 'Source URL has no host'));
+            throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL_HOST', 'Source URL has no host'));
         }
 
         $embed = new Embed();
@@ -219,11 +221,17 @@ class Embeddable extends DataExtension
 
     /**
      * Get the embed data using a source URL and write relevant data to the owner
+     * @throws \SilverStripe\ORM\ValidationException
      */
     protected function writeFromEmbed(bool $force = false): bool
     {
         try {
             $extractor = $this->getExtractor();
+            if (is_null($extractor)) {
+                // no extractor.. URL is empty
+                return false;
+            }
+
             $owner = $this->getOwner();
             // write title if current is empty
             if ($owner->EmbedTitle == '') {
@@ -251,6 +259,8 @@ class Embeddable extends DataExtension
 
             return true;
 
+        } catch (InvalidSourceUrlException) {
+            return false;
         } catch (\Throwable $throwable) {
             Logger::log("Error writing embed object: " . $throwable->getMessage(), "NOTICE");
             throw \SilverStripe\ORM\ValidationException::create(_t(
@@ -266,7 +276,6 @@ class Embeddable extends DataExtension
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        $this->getOwner();
         $this->writeFromEmbed($this->getOwner()->ForceUpdate == '1');
     }
 
