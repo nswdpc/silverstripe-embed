@@ -5,6 +5,8 @@ namespace NSWDPC\Embed\Extensions;
 use Embed\Embed;
 use Embed\Extractor;
 use Embed\OEmbed;
+use Embed\Http\Crawler;
+use Embed\Http\CurlClient;
 use NSWDPC\Embed\Exceptions\InvalidSourceUrlException;
 use NSWDPC\Embed\Services\Logger;
 use SilverStripe\Assets\Image;
@@ -191,8 +193,37 @@ class Embeddable extends Extension
             throw new InvalidSourceUrlException(_t(self::class . '.EMPTY_SOURCE_URL_HOST', 'Source URL has no host'));
         }
 
-        $embed = new Embed();
+        $embed = $this->getEmbedInstance();
         return $embed->get($sourceURL);
+    }
+
+    /**
+     * Return the Embed instance to use
+     */
+    public function getEmbedInstance(): Embed
+    {
+        return new Embed($this->getEmbedCrawler());
+    }
+
+    /**
+     * Return the Embed Crawler instance to use
+     */
+    public function getEmbedCrawler(): ?Crawler
+    {
+        $client = new CurlClient();
+        $client->setSettings($this->getEmbedCurlSettings());
+        return new Crawler($client);
+    }
+
+    /**
+     * Provide default cURL settings for Embed
+     */
+    public function getEmbedCurlSettings(): array
+    {
+        return [
+            'ssl_verify_host' => 2,
+            'ssl_verify_peer' => true
+        ];
     }
 
     /**
