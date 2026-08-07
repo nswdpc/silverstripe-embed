@@ -5,6 +5,7 @@ namespace NSWDPC\Embed\Services;
 use NSWDPC\Embed\Extensions\Embeddable;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\XssSanitiser;
+use SilverStripe\ORM\DataObject;
 
 class HTMLFilter
 {
