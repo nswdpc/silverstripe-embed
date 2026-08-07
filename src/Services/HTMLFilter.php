@@ -22,6 +22,7 @@ class HTMLFilter
                 if($elementsToRemove !== []) {
                     $sanitiser = $sanitiser->setElementsToRemove($elementsToRemove);
                 }
+
                 return $sanitiser->sanitiseString($embedHtml);
             }
         } catch (\Exception $exception) {
