@@ -3,8 +3,6 @@
 namespace NSWDPC\Embed\Tests;
 
 use Embed\Embed;
-use Embed\Http\Crawler;
-use Embed\Http\CurlClient;
 use NSWDPC\Embed\Extensions\Embeddable;
 use NSWDPC\Embed\Models\Video;
 use SilverStripe\Dev\SapphireTest;
