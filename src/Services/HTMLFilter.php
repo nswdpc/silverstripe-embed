@@ -2,24 +2,22 @@
 
 namespace NSWDPC\Embed\Services;
 
-use Embed\Extractor;
 use NSWDPC\Embed\Extensions\Embeddable;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\XssSanitiser;
 
 class HTMLFilter
 {
-
     use Injectable;
 
     public function sanitiseHtml(string $embedHtml, array $elementsToRemove = []): string
     {
         try {
-            if($embedHtml === '') {
+            if ($embedHtml === '') {
                 return '';
             } else {
                 $sanitiser = XssSanitiser::create();
-                if($elementsToRemove !== []) {
+                if ($elementsToRemove !== []) {
                     $sanitiser = $sanitiser->setElementsToRemove($elementsToRemove);
                 }
 
@@ -36,7 +34,7 @@ class HTMLFilter
      */
     public function getHtmlFromEmbeddable(object $embeddable, array $elementsToRemove = []): string
     {
-        if(($embeddable instanceof DataObject) && $embeddable->hasExtension(Embeddable::class)) {
+        if (($embeddable instanceof DataObject) && $embeddable->hasExtension(Embeddable::class)) {
             return $this->sanitiseHtml(($embeddable->getField('EmbedHTML') ?? ''), $elementsToRemove);
         } else {
             return '';
