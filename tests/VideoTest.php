@@ -2,6 +2,7 @@
 
 namespace NSWDPC\Embed\Tests;
 
+use Embed\Embed;
 use NSWDPC\Embed\Extensions\Embeddable;
 use NSWDPC\Embed\Models\Video;
 use SilverStripe\Dev\SapphireTest;
@@ -59,5 +60,21 @@ class VideoTest extends SapphireTest
             $template->__toString()
         );
 
+    }
+
+    public function testEmbedInstance(): void
+    {
+        $url = "https://www.youtube.com/watch?v=YH3c1QZzRK4";
+        $video = Video::create();
+        $this->assertTrue($video->hasExtension(Embeddable::class));
+        $video->EmbedSourceURL = $url;
+        $embed = $video->getEmbedInstance();
+        $this->assertInstanceof(Embed::class, $embed);
+
+        $settings = $video->getEmbedCurlSettings();
+        $this->assertArrayHasKey('ssl_verify_host', $settings);
+        $this->assertArrayHasKey('ssl_verify_peer', $settings);
+        $this->assertEquals(2, $settings['ssl_verify_host']);
+        $this->assertEquals(true, $settings['ssl_verify_peer']);
     }
 }
